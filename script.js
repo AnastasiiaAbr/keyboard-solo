@@ -1,11 +1,8 @@
 const word = document.querySelector('.word');
-let wrongLettersCount = document.querySelector('.word-mistakes');
+const wrongLettersCount = document.querySelector('.word-mistakes');
 const correctWords = document.querySelector('.correct-count');
 const wrongWords = document.querySelector('.wrong-count');
 const timeDisplay = document.querySelector('#timer');
-const overlay = document.querySelector('.overlay');
-const overlayMessage = document.querySelector('.message');
-const restartButton = document.querySelector('.restart-btn');
 
 
 let currentWord = '';
@@ -21,8 +18,8 @@ let finalTime = '';
 
 async function getRandomWord() {
   try {
-    const responce = await fetch('https://random-word-api.vercel.app/api?words=5');
-    const data = await responce.json();
+    const response = await fetch('https://random-word-api.vercel.app/api?words=1');
+    const data = await response.json();
     currentWord = data[0].toLowerCase();
     currentIndex = 0;
     word.innerHTML = '';
@@ -33,8 +30,7 @@ async function getRandomWord() {
       word.append(span);
     });
   } catch {
-    overlay.style.display = 'flex';
-    overlayMessage.textContent = 'Упс. Что-то пошло не так... Попробуй еще раз'
+    alert('Упс. Что-то пошло не так... Попробуй еще раз');
   }
 }
 
@@ -61,6 +57,16 @@ function toggleStopwatch() {
   }
 }
 
+function checkGameEnd() {
+  if (correctWordsCount === 5 || wrongWordsCount === 5) {
+    finalTime = timeDisplay.textContent;
+    clearInterval(timerId);
+    gameOver = true;
+    alert(`${correctWordsCount === 5 ? 'Победа' : 'Неудача'}! Ваше время ${finalTime}`);
+    document.removeEventListener('keydown', handleKeyDown);
+  }
+}
+
 
 function handleKeyDown(event) {
   if (gameOver) return;
@@ -82,53 +88,22 @@ function handleKeyDown(event) {
   if (currentIndex === currentWord.length) {
     getRandomWord();
     if (wrongLetters > 0) {
-        wrongWordsCount++;
-        wrongWords.textContent = wrongWordsCount;
-      } else {
-    correctWordsCount++;
-    correctWords.textContent = correctWordsCount;
-      }
-      wrongLetters = 0;
-      wrongLettersCount.textContent = wrongLetters;
+      wrongWordsCount++;
+      wrongWords.textContent = wrongWordsCount;
+    } else {
+      correctWordsCount++;
+      correctWords.textContent = correctWordsCount;
     }
-    if (correctWordsCount === 5 || wrongWordsCount === 5) {
-      finalTime = timeDisplay.textContent;
-      clearInterval(timerId);
-      gameOver = true;
-      overlay.style.display = 'flex';
-      overlayMessage.textContent = `${correctWordsCount === 5 ? 'Победа' : 'Неудача'}! Ваше время - ${finalTime}`;
-      document.removeEventListener('keydown', handleKeyDown);
-    }
-    
-  }
-
-  function restartGame() {
-    currentIndex = 0;
     wrongLetters = 0;
-    correctWordsCount = 0;
-    wrongWordsCount = 0;
-    isActive = false;
-    gameOver = false;
-    finalTime = '';
-  
-    correctWords.textContent = '0';
-    wrongWords.textContent = '0';
-    wrongLettersCount.textContent = '0';
-    timeDisplay.textContent = '00:00';
-  
-    word.innerHTML = '';
-  
-    overlay.style.display = 'none';
-  
-    getRandomWord();
-
-    document.addEventListener('keydown', handleKeyDown);
+    wrongLettersCount.textContent = wrongLetters;
   }
-  
 
-  document.addEventListener('keydown', handleKeyDown)
+  checkGameEnd();
 
-  restartButton.addEventListener('click', restartGame);
+}
+
+
+document.addEventListener('keydown', handleKeyDown)
 
 
 
