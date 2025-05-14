@@ -97,10 +97,9 @@ function handleKeyDown(event) {
     wrongLetters = 0;
     wrongLettersCount.textContent = wrongLetters;
   }
-
-  checkGameEnd();
-
+  setTimeout(checkGameEnd, 0);
 }
+
 
 
 document.addEventListener('keydown', handleKeyDown)
